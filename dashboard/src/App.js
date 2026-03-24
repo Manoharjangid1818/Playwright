@@ -5,7 +5,7 @@ function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const runTestHandler = async () => {
+  const runTest = async () => {
     if (!url) {
       setResult("Please enter a URL");
       return;
@@ -15,17 +15,15 @@ function App() {
     setResult("");
 
     try {
-      const res = await fetch(
-        `${process.env.REACT_APP_API_URL}/run-test`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url }),
-        }
-      );
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/run-test`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
       const data = await res.json();
       setResult(data.message);
-    } catch {
+    } catch (err) {
       setResult("❌ Error connecting to backend");
     }
 
@@ -46,7 +44,7 @@ function App() {
 
       <br /><br />
 
-      <button onClick={runTestHandler}>
+      <button onClick={runTest}>
         {loading ? "Running..." : "Run Test"}
       </button>
 
