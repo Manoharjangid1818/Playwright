@@ -1,4 +1,3 @@
-// dashboard/src/App.js
 import { useState } from "react";
 
 function App() {
@@ -6,10 +5,6 @@ function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Use backend URL from environment variable
-  const API_URL = process.env.REACT_APP_API_URL;
-
-  // Function to run the test
   const runTestHandler = async () => {
     if (!url) {
       setResult("Please enter a URL");
@@ -20,20 +15,17 @@ function App() {
     setResult("");
 
     try {
-      const res = await fetch(`${API_URL}/run-test`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
-      }
-
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/run-test`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        }
+      );
       const data = await res.json();
-      setResult(data.message || "Test completed successfully!");
-    } catch (err) {
-      console.error(err);
+      setResult(data.message);
+    } catch {
       setResult("❌ Error connecting to backend");
     }
 
@@ -41,13 +33,7 @@ function App() {
   };
 
   return (
-    <div
-      style={{
-        textAlign: "center",
-        marginTop: "80px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
+    <div style={{ textAlign: "center", marginTop: "80px", fontFamily: "Arial" }}>
       <h1>QA360 Dashboard 🚀</h1>
 
       <input
@@ -58,13 +44,9 @@ function App() {
         style={{ padding: "10px", width: "300px" }}
       />
 
-      <br />
-      <br />
+      <br /><br />
 
-      <button
-        onClick={runTestHandler} // eslint-friendly name
-        style={{ padding: "10px 20px", cursor: "pointer" }}
-      >
+      <button onClick={runTestHandler}>
         {loading ? "Running..." : "Run Test"}
       </button>
 
