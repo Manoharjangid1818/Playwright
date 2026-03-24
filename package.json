@@ -1,12 +1,11 @@
 {
-  "name": "qa360-backend",
+  "name": "qa360",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "node backend/server.js",
+    "build": "npm --prefix dashboard run build",
+    "test": "npm --prefix dashboard run test -- --watchAll=false"
   },
   "dependencies": {
     "cors": "^2.8.5",

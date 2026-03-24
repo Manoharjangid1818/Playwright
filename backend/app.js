@@ -1,32 +1,59 @@
-const express = require("express");
-const cors = require("cors");
+import { useState } from "react";
 
-const app = express();
+function App() {
+  const [url, setUrl] = useState("");
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
-app.use(cors());
-app.use(express.json());
+  const runTest = async () => {
+    if (!url) {
+      setResult("Please enter a URL");
+      return;
+    }
 
-// health check
-app.get("/", (req, res) => {
-  res.send("QA360 Backend Running 🚀");
-});
+    setLoading(true);
+    setResult("");
 
-// test API
-app.post("/run-test", (req, res) => {
-  const { url } = req.body;
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/run-test`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        }
+      );
 
-  if (!url) {
-    return res.status(400).json({ error: "URL is required" });
-  }
+      const data = await res.json();
+      setResult(data.message);
+    } catch (err) {
+      setResult("❌ Error connecting to backend");
+    }
 
-  res.json({
-    status: "PASS",
-    message: `Test executed for ${url}`,
-  });
-});
+    setLoading(false);
+  };
 
-const PORT = process.env.PORT || 3000;
+  return (
+    <div style={{ textAlign: "center", marginTop: "80px", fontFamily: "Arial" }}>
+      <h1>QA360 Dashboard 🚀</h1>
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+      <input
+        type="text"
+        placeholder="Enter website URL"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        style={{ padding: "10px", width: "300px" }}
+      />
+
+      <br /><br />
+
+      <button onClick={runTest}>
+        {loading ? "Running..." : "Run Test"}
+      </button>
+
+      <h3>{result}</h3>
+    </div>
+  );
+}
+
+export default App;

@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "http://localhost:8080";
+
 function App() {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState("");
@@ -15,7 +18,7 @@ function App() {
     setResult("");
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/run-test`, {
+      const res = await fetch(`${API_BASE_URL}/run-test`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
