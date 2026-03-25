@@ -1,54 +1,64 @@
 const express = require("express");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
-const { exec } = require("child_process");
+const { chromium } = require("playwright");
 
 const app = express();
 
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
-// Rate limiter
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
 });
 app.use(limiter);
 
-// RUN TEST API
-app.post("/run-test", (req, res) => {
+app.post("/run-test", async (req, res) => {
   const { url } = req.body;
 
   if (!url) {
     return res.status(400).json({ message: "URL is required" });
   }
 
-  console.log("Running Playwright test for:", url);
+  console.log("Running REAL Playwright test for:", url);
 
-  // ✅ FIXED COMMAND (NO FILE PATH ISSUE)
-  const command =
-  process.platform === "win32"
-    ? `set TEST_URL=${url} && npx playwright test`
-    : `TEST_URL=${url} npx playwright test`;
+  let browser;
 
-  exec(command, { timeout: 60000 }, (error, stdout, stderr) => {
-    if (error) {
-      console.error("Test failed:", stderr);
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
 
-      return res.json({
-        status: "fail",
-        message: "Test execution failed",
-        error: stderr,
-      });
-    }
+    const page = await browser.newPage();
+
+    await page.goto(url, { timeout: 30000 });
+
+    const title = await page.title();
+
+    await page.screenshot({ path: "screenshot.png" });
+
+    await browser.close();
 
     return res.json({
       status: "success",
-      message: "Test executed successfully",
+      message: "Website loaded successfully",
       testedUrl: url,
-      output: stdout,
+      title: title
     });
-  });
+
+  } catch (error) {
+    if (browser) await browser.close();
+
+    console.error("Error:", error.message);
+
+    return res.json({
+      status: "fail",
+      message: "Test failed",
+      error: error.message
+    });
+  }
 });
 
 module.exports = app;
