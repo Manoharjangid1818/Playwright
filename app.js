@@ -14,6 +14,10 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+app.get("/", (req, res) => {
+  res.send("QA360 Backend Running 🚀");
+});
+
 app.post("/run-test", async (req, res) => {
   const { url } = req.body;
 
@@ -28,12 +32,20 @@ app.post("/run-test", async (req, res) => {
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu"
+      ]
     });
 
     const page = await browser.newPage();
 
-    await page.goto(url, { timeout: 30000 });
+    await page.goto(url, {
+      timeout: 30000,
+      waitUntil: "domcontentloaded"
+    });
 
     const title = await page.title();
 
