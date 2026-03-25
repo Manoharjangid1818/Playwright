@@ -26,7 +26,8 @@ if [ "$(uname -s)" = "Linux" ] && command -v apt-get >/dev/null 2>&1; then
     libcairo2 \
     libxkbcommon0 \
     libfontconfig1 \
-    libxshmfence1 || true
+    libxshmfence1 \
+    libasound2 || true
 fi
 
 if [ ! -d "node_modules" ]; then
