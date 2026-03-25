@@ -27,9 +27,9 @@ app.post("/run-test", (req, res) => {
 
   // ✅ FIXED COMMAND (NO FILE PATH ISSUE)
   const command =
-    process.platform === "win32"
-      ? `set TEST_URL=${url} && npx playwright test`
-      : `TEST_URL=${url} npx playwright test`;
+  process.platform === "win32"
+    ? `set TEST_URL=${url} && npx playwright test`
+    : `TEST_URL=${url} npx playwright test`;
 
   exec(command, { timeout: 60000 }, (error, stdout, stderr) => {
     if (error) {
