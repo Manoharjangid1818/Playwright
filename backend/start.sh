@@ -4,6 +4,7 @@ set -e
 # Railway may run this on a Linux container.
 # Install dependencies only if they are missing to keep startup fast.
 if [ "$(uname -s)" = "Linux" ] && command -v apt-get >/dev/null 2>&1; then
+  echo "backend/start.sh: installing system libs for Chromium (apt-get)"
   # Chromium (Playwright) needs various system libraries.
   # Install the common set so Railway's minimal image can launch headless Chromium.
   export DEBIAN_FRONTEND=noninteractive
@@ -30,7 +31,13 @@ if [ "$(uname -s)" = "Linux" ] && command -v apt-get >/dev/null 2>&1; then
 fi
 
 if [ ! -d "node_modules" ]; then
+  echo "backend/start.sh: node_modules missing -> npm install"
   npm install
+fi
+
+if [ "$(uname -s)" = "Linux" ]; then
+  echo "backend/start.sh: running Playwright --with-deps install"
+  npx playwright install --with-deps chromium || true
 fi
 
 npm start

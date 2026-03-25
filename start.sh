@@ -6,6 +6,7 @@ set -e
 cd backend
 
 if [ "$(uname -s)" = "Linux" ] && command -v apt-get >/dev/null 2>&1; then
+  echo "Railway start.sh: installing system libs for Chromium (apt-get)"
   # Chromium (Playwright) needs various system libraries.
   export DEBIAN_FRONTEND=noninteractive
   # Don't fail the whole container if the package step fails; the health
@@ -31,7 +32,13 @@ if [ "$(uname -s)" = "Linux" ] && command -v apt-get >/dev/null 2>&1; then
 fi
 
 if [ ! -d "node_modules" ]; then
+  echo "Railway start.sh: node_modules missing -> npm install"
   npm install
+fi
+
+if [ "$(uname -s)" = "Linux" ]; then
+  echo "Railway start.sh: running Playwright --with-deps install"
+  npx playwright install --with-deps chromium || true
 fi
 
 npm start
