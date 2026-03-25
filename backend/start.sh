@@ -35,10 +35,5 @@ if [ ! -d "node_modules" ]; then
   npm install
 fi
 
-if [ "$(uname -s)" = "Linux" ]; then
-  echo "backend/start.sh: running Playwright --with-deps install"
-  npx playwright install --with-deps chromium || true
-fi
-
 npm start
 
